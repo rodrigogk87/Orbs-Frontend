@@ -1,13 +1,16 @@
 import logo from './logo.svg';
 import './App.css';
 import * as Tone from 'tone'
-import Button from '@material-ui/core/Button';
+import {Button,Grid,Avatar} from '@material-ui/core';
 import sampler from "./samplerLoader";
+import React,{ useState,useEffect }  from 'react';
+import Canvas from './Canvas';
 
 //https://en.wikipedia.org/wiki/Scientific_pitch_notation
 function App() {
 
-  
+  const [ elements, setElements ] = useState([]);
+
 
   const playTone = () =>{
     
@@ -27,7 +30,9 @@ function App() {
       jaux = j;
       let note=Math.round((Math.random() * 4) + 2);
       let tone = arrNotes[Math.round(Math.random() * 6)];
-      console.log(tone+note);
+      let element = tone+note+' '+(now+j);
+      
+      setElements((elements)=>[...elements,element]);
       sampler.triggerAttack(tone+note, now+j, 2)
       if(i%Math.round((Math.random() * 4) + 2)==0)
       synthDrum.triggerAttackRelease("C2", "8n",now+j);
@@ -39,7 +44,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <Button onClick={playTone} variant="contained">Random Melody</Button>    
+         <Canvas elements={elements}/>
+         <Button onClick={playTone} variant="contained">Random Melody</Button>    
       </header>
     </div>
   );
