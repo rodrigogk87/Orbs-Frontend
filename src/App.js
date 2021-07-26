@@ -5,6 +5,7 @@ import OrbBirth from './OrbBirth';
 import OrbsList from './OrbsList';
 import Orbs from './contracts/Orbs.json';
 import { getWeb3 } from './utils.js';
+import {Container,Grid} from '@material-ui/core';
 
 //https://en.wikipedia.org/wiki/Scientific_pitch_notation
 function App() {
@@ -22,6 +23,7 @@ function App() {
     const init = async () => {
       try{
         const web3 = await getWeb3();
+        console.log(web3);
         
         const accounts = await web3.eth.getAccounts();
         const networkId = await web3.eth.net.getId();
@@ -65,16 +67,23 @@ function App() {
 
 
 
+  async function reloadList(){
+    const orbsResult = await contract.methods.getAllOrbs().call();
+    setOrbs(orbsResult);
+    console.log(orbsResult);
+  }
 
 
   return (
     <div className="App">
       <header className="App-header">
         {web3 ?
-          <>
-            <OrbsList orbs={orbs} />
-            <OrbBirth accounts={accounts} contract={contract}/>
-          </>     
+          <Container id="main_container" maxWidth="false">
+            <Grid container spacing={2}>         
+                <OrbBirth accounts={accounts} contract={contract} reloadList={reloadList}/>
+                <OrbsList orbs={orbs} />
+            </Grid>
+          </Container>     
           :
           <></>
           }

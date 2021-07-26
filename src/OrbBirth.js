@@ -28,16 +28,19 @@ component and you want to save the request data in the component's state.*/
 //https://ipfs.infura.io/ipfs/QmQnbxfGtXFfB5vr7qUrzNHdNnQiHzm6yDnysW3P2dYj7P
 //https://modernweb.com/creating-particles-html5-canvas/
 //https://codepen.io/blancocd/pen/wvJXpge
+//https://xparkmedia.com/blog/mediaelements-add-a-share-button-to-video-elements-using-jquery/
+//https://video-react.js.org/
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) 
 
-function OrbBirth({accounts,contract}){
+function OrbBirth({accounts,contract,reloadList}){
   
   const [ clicked, setClicked ] = useState(false);
   const [ duration, setDuration ] = useState(0);
   const [ elements, setElements ] = useState([]);
   const [orbBlobs, setOrbBlobs] = useState([]);
   const [finished, setFinished] = useState(false);
+  const [borning, setBorning ] = useState(false);
 
   let soundInfo = [];
 
@@ -71,11 +74,13 @@ function OrbBirth({accounts,contract}){
       frameCount++
       draw(context, frameCount,subelements)
       animationFrameId = window.requestAnimationFrame(render)
+      if(orbBlobs.length == 1)
+      context.clearRect(0, 0, canvas.width, canvas.height);
     }
     render()
     
     return () => {
-      window.cancelAnimationFrame(animationFrameId)
+      window.cancelAnimationFrame(animationFrameId);
     }
   }, [draw])
 
@@ -84,6 +89,9 @@ function OrbBirth({accounts,contract}){
     const uploadToIpfs = async () =>{ 
         if(orbBlobs.length == 1){
           console.log('entro');
+          setFinished(true);
+          setBorning(false);
+          
           const file = await ipfs.add(orbBlobs[0],async (error, result) => {
               console.log('Ipfs result', result)
               if(error) {
@@ -94,22 +102,14 @@ function OrbBirth({accounts,contract}){
                 
               }
             })
-
+          
           if(typeof file.path !== "undefined" && file.path!=''){
             let res = await contract.methods.mintCollectable(accounts[0],file.path).send({from:accounts[0] }).on('transactionHash', (hash) => {
               setFinished(true);
+              reloadList();
               console.log(hash);
             }) 
-
-            console.log(res);
           }
-          /*
-          to have a local copy but maybe too invasive
-          const url = URL.createObjectURL(orbBlobs[0]);
-          const anchor = document.createElement("a");
-          anchor.download = "orb"+elements[0]+".webm";
-          anchor.href = url;
-          anchor.click();*/
         }
 
     }
@@ -120,6 +120,7 @@ function OrbBirth({accounts,contract}){
 
 
   const playTone = async() =>{
+    setBorning(true);
     const audio_recorder = new Tone.Recorder();
 
     const video_chunks = []; 
@@ -134,30 +135,34 @@ function OrbBirth({accounts,contract}){
     sampler.connect(audio_recorder);
     setClicked(true);
     const arrNotes = ["A","B","C","D","E","F","G"]
-    const duration = 10;
+    const duration = 15;
     setDuration(duration);
     const now = Tone.now(); 
-
     //START RECORDERD
     video_recorder.ondataavailable = e => { video_chunks.push(e.data); }
     video_recorder.start();
 
     //the math of the music :-)
     let jaux = -1;
-    for(let i=0;i<duration;i++){ 
-      let j=i/(Math.round((Math.random() * 4) + 1));
+    let j=0;
+    for(let i=0;duration-j > 0;i++){ 
+      
+      j= i/(Math.round((Math.random() * 2) + ((Math.random() * 10) + 1)) );
+      
       if(j < jaux){
-        j=jaux+1/2;
+        j=jaux+1/((Math.random() * 6) + 2);
       }
       jaux = j;
-      let note=Math.round((Math.random() * 4) + 2);
+      let note=Math.round((Math.random() * 6) + 1);
       let tone = arrNotes[Math.round(Math.random() * 6)];
       let element = soliditySha3(tone+note+' '+(now+j)).slice(-6);
       
       setElements((elements)=>[...elements,element]);
       sampler.triggerAttack(tone+note, now+j, 2)
+      
       //if(i%Math.round((Math.random() * 4) + 2)==0)
       //synthDrum.triggerAttackRelease("C2", "8n",now+j);
+      
       soundInfo[i]=tone+";"+note+";"+(now+j)+";"+element;
     }
 
@@ -184,7 +189,14 @@ function OrbBirth({accounts,contract}){
   
   return    <div>
                 <canvas ref={canvasRef}/>
+                {!finished && !borning ?
                 <Button id="generator" onClick={playTone} variant="contained">Mint Orb</Button>
+                :
+                !borning ?
+                <Button id="reloader" onClick={()=>window.location.reload()} variant="contained">Mint Another!</Button>
+                :
+                <div>Orb is borning, wait to claim.....</div>
+                }
               </div>
 }
 
