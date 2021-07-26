@@ -35,6 +35,7 @@ function OrbBirth(){
   const [ duration, setDuration ] = useState(0);
   const [ elements, setElements ] = useState([]);
   const [orbBlobs, setOrbBlobs] = useState([]);
+  const [finished, setFinished] = useState(false);
 
   let soundInfo = [];
 
@@ -44,7 +45,7 @@ function OrbBirth(){
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       ctx.fillStyle = '#'+elements[frameCount%elements.length];
       ctx.beginPath()
-      ctx.arc(ctx.canvas.width/2, ctx.canvas.height/2, 100*Math.sin(frameCount*0.05)**2, 0, 2*Math.PI)
+      ctx.arc(ctx.canvas.width/2, ctx.canvas.height/2, 100*(0.8+Math.sin(frameCount*0.05)**2), 0, 2*Math.PI)
       ctx.fill()
     }
   }
@@ -79,7 +80,8 @@ function OrbBirth(){
 
   useEffect(() => {
     const uploadToIpfs = async () =>{ 
-        if(orbBlobs.length == 2){
+        if(orbBlobs.length == 1){
+          setFinished(true);
           /*const file = await ipfs.add(orbBlobs[1], (error, result) => {
             console.log('Ipfs result', result)
             if(error) {
@@ -89,7 +91,7 @@ function OrbBirth(){
             console.log(result[0].hash);
           })
           console.log(file)*/
-          const url = URL.createObjectURL(orbBlobs[1]);
+          const url = URL.createObjectURL(orbBlobs[0]);
           const anchor = document.createElement("a");
           anchor.download = "recording.webm";
           anchor.href = url;
@@ -118,12 +120,11 @@ function OrbBirth(){
     sampler.connect(audio_recorder);
     setClicked(true);
     const arrNotes = ["A","B","C","D","E","F","G"]
-    const duration = 10;
+    const duration = 20;
     setDuration(duration);
     const now = Tone.now(); 
 
     //START RECORDERD
-    audio_recorder.start();
     video_recorder.ondataavailable = e => { video_chunks.push(e.data); }
     video_recorder.start();
 
@@ -149,12 +150,8 @@ function OrbBirth(){
     // wait for the notes to end and stop the recording
     setTimeout(async () => {
       // the recorded audio is returned as a blob
-      const recording_audio = await audio_recorder.stop();
       const recording_video = await video_recorder.stop();
       video_recorder.onstop = e => setOrbBlobs((orbBlobs)=>[...orbBlobs,new Blob(video_chunks, {type: 'video/webm'})]);   
-
-      setOrbBlobs((orbBlobs)=>[...orbBlobs,recording_audio]); 
-      //QUIZAS AQUI GUARDAR EN BLOCKCHAIN, PERO AUN FALTA VER SOBRE QUE GUARDAR
 
     }, duration * 1000);
 
