@@ -1,8 +1,8 @@
 import React, { useRef, useEffect } from 'react'
 
-const OrbsList = orbs => {
-    //console.log(orbs);
-  return ( orbs.map(orb => {return (<div>{orbs.id} - {orb.owner} - {orb.sample_data}</div> )}) );
+function OrbsList ( { orbs }) {
+  console.log(orbs);
+  return ( orbs.map(orb => {return (<div>ID: {orb.id} - Price: {orb.price} - <a target="_blank" href={orb.uri}>See orb</a></div> )}) );
 }
 
 export default OrbsList

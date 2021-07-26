@@ -25,11 +25,13 @@ component and you want to save the request data in the component's state.*/
 //https://stackoverflow.com/questions/15970729/appending-blob-data
 //https://github.com/samirkumardas/jmuxer
 //muxer ---> obj that conmbines video and audio
-//https://ipfs.infura.io/ipfs/QmS45jFuF9VTUiKRtgv7bVGjJT1JqpNr4oVhNvxna5nuVZ
+//https://ipfs.infura.io/ipfs/QmQnbxfGtXFfB5vr7qUrzNHdNnQiHzm6yDnysW3P2dYj7P
+//https://modernweb.com/creating-particles-html5-canvas/
+//https://codepen.io/blancocd/pen/wvJXpge
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) 
 
-function OrbBirth(){
+function OrbBirth({accounts,contract}){
   
   const [ clicked, setClicked ] = useState(false);
   const [ duration, setDuration ] = useState(0);
@@ -45,7 +47,7 @@ function OrbBirth(){
       ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
       ctx.fillStyle = '#'+elements[frameCount%elements.length];
       ctx.beginPath()
-      ctx.arc(ctx.canvas.width/2, ctx.canvas.height/2, 100*(0.8+Math.sin(frameCount*0.05)**2), 0, 2*Math.PI)
+      ctx.arc(ctx.canvas.width/2, ctx.canvas.height/2, 50*(0.7+Math.sin(frameCount*0.05)**2), 0, 2*Math.PI)
       ctx.fill()
     }
   }
@@ -81,21 +83,33 @@ function OrbBirth(){
   useEffect(() => {
     const uploadToIpfs = async () =>{ 
         if(orbBlobs.length == 1){
-          setFinished(true);
-          /*const file = await ipfs.add(orbBlobs[1], (error, result) => {
-            console.log('Ipfs result', result)
-            if(error) {
-              console.error(error)
-              return
-            }
-            console.log(result[0].hash);
-          })
-          console.log(file)*/
+          console.log('entro');
+          const file = await ipfs.add(orbBlobs[0],async (error, result) => {
+              console.log('Ipfs result', result)
+              if(error) {
+                console.error(error)
+                return
+              }else{
+                console.log(result[0].hash);            
+                
+              }
+            })
+
+          if(typeof file.path !== "undefined" && file.path!=''){
+            let res = await contract.methods.mintCollectable(accounts[0],file.path).send({from:accounts[0] }).on('transactionHash', (hash) => {
+              setFinished(true);
+              console.log(hash);
+            }) 
+
+            console.log(res);
+          }
+          /*
+          to have a local copy but maybe too invasive
           const url = URL.createObjectURL(orbBlobs[0]);
           const anchor = document.createElement("a");
-          anchor.download = "recording.webm";
+          anchor.download = "orb"+elements[0]+".webm";
           anchor.href = url;
-          anchor.click();
+          anchor.click();*/
         }
 
     }
@@ -120,7 +134,7 @@ function OrbBirth(){
     sampler.connect(audio_recorder);
     setClicked(true);
     const arrNotes = ["A","B","C","D","E","F","G"]
-    const duration = 20;
+    const duration = 10;
     setDuration(duration);
     const now = Tone.now(); 
 

@@ -33,11 +33,12 @@ function App() {
           deployedNetwork && deployedNetwork.address,
         );
         
-        const orbsResult = await contract.methods.getOrbs().call();
+        const orbsResult = await contract.methods.getAllOrbs().call();
         setWeb3(web3);
         setAccounts(accounts);
         setContract(contract);
         setOrbs(orbsResult);
+        console.log(orbsResult);
         setLoading(false);
         console.log(orbs);
       }
@@ -69,10 +70,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        {!web3 ?
+        {web3 ?
           <>
-            
-            <OrbBirth/>
+            <OrbsList orbs={orbs} />
+            <OrbBirth accounts={accounts} contract={contract}/>
           </>     
           :
           <></>
