@@ -4,6 +4,7 @@ import sampler from "./samplerLoader";
 import { soliditySha3 }  from 'web3-utils';
 import {Button,Grid,Avatar} from '@material-ui/core';
 
+
 /*Generally speaking, using setState inside useEffect will create an infinite loop that most likely you don't want to cause. 
 There are a couple of exceptions to that rule which I will get into later.
 useEffect is called after each render and when setState is used inside of it, it will cause the component to 
@@ -88,9 +89,11 @@ function OrbBirth(){
             console.log(result[0].hash);
           })
           console.log(file)*/
-          /*let combined = new MediaStream([...orbBlobs[0].getStreams().getTracks(), ...orbBlobs[1].getStreams().getTracks()]);
-          let recorder = new MediaRecorder(combined);
-          console.log(recorder);*/
+          const url = URL.createObjectURL(orbBlobs[1]);
+          const anchor = document.createElement("a");
+          anchor.download = "recording.webm";
+          anchor.href = url;
+          anchor.click();
         }
 
     }
@@ -99,29 +102,23 @@ function OrbBirth(){
 
   }, [orbBlobs])
 
-  function blobToFile(theBlob, fileName){
-    //A Blob() is almost a File() - it's just missing the two properties below which we will add
-      theBlob.lastModifiedDate = new Date();
-      theBlob.name = fileName;
-      return theBlob;
-  }
-
-
-
 
   const playTone = async() =>{
+    const audio_recorder = new Tone.Recorder();
+
     const video_chunks = []; 
     console.log(canvasRef.current);
     const stream = canvasRef.current.captureStream();
     const video_recorder = new MediaRecorder(stream);
-    const audio_recorder = new Tone.Recorder();
-    
+    let audioTrack = audio_recorder._recorder.stream.getAudioTracks()[0];
+    // add it to your canvas stream:
+    stream.addTrack(audioTrack);
     
     //SET DATA
     sampler.connect(audio_recorder);
     setClicked(true);
     const arrNotes = ["A","B","C","D","E","F","G"]
-    const duration = 5;
+    const duration = 10;
     setDuration(duration);
     const now = Tone.now(); 
 
