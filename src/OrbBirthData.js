@@ -66,6 +66,7 @@ function OrbBirthData({accounts,contract,reloadList}){
     const duration = 15;
     setDuration(duration);
     const now = Tone.now(); 
+    console.log(now);
     let jaux = -1;
     let j=0;
     let soundInfoTmp = '';
@@ -88,9 +89,9 @@ function OrbBirthData({accounts,contract,reloadList}){
       //synthDrum.triggerAttackRelease("C2", "8n",now+j);
 
       if(duration-j <= 0)
-      soundInfoTmp+=tone+";"+note+";"+(now+j)+";"+audioElement;
+      soundInfoTmp+=tone+";"+note+";"+j+";"+audioElement;
       else
-      soundInfoTmp+=tone+";"+note+";"+(now+j)+";"+audioElement+"||";
+      soundInfoTmp+=tone+";"+note+";"+j+";"+audioElement+"||";
       
     }
     

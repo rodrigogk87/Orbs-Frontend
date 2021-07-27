@@ -31,16 +31,10 @@ function OrbsList ( { orbs,accounts }) {
   async function playSound(dna){
     let soundInfo = ((dna.split('^^'))[1]).split('||');
     const now = Tone.now();
-    
-    if (Tone.Transport.state === "paused" ) {  
-        Tone.Transport.start("+0.1");
-    }else {
-        Tone.Transport.pause();
-    }
 
     for(let i=0;i < soundInfo.length;i++){ 
       let info = soundInfo[i].split(';');
-      console.log(now+parseFloat(info[2]));
+      console.log(now,now+parseFloat(info[2]));
       sampler.triggerAttack(info[0]+info[1], now+parseFloat(info[2]), 2);
     }
   }
