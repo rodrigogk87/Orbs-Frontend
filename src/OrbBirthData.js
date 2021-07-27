@@ -60,14 +60,12 @@ function OrbBirthData({accounts,contract,reloadList}){
 
 
   const playTone = async() =>{
-
     setBorning(true); 
     setClicked(true);
     const arrNotes = ["A","B","C","D","E","F","G"]
     const duration = 15;
     setDuration(duration);
     const now = Tone.now(); 
-
     let jaux = -1;
     let j=0;
     let soundInfoTmp = '';
@@ -76,7 +74,7 @@ function OrbBirthData({accounts,contract,reloadList}){
       j= i/(Math.round((Math.random() * 2) + ((Math.random() * 5) + 1)) );
       
       if(j < jaux){
-        j=jaux+1/((Math.random() * 6) + 2);
+        j=jaux+(1/2);
       }
       jaux = j;
       let note=Math.round((Math.random() * 6) + 1);

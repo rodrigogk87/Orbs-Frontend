@@ -6,6 +6,9 @@ import web3 from 'web3';
 import Sphere from './Sphere';
 import { Canvas, useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
+import * as Tone from 'tone'
+import sampler from "./samplerLoader";
+
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -19,10 +22,27 @@ const useStyles = makeStyles((theme) => ({
 function OrbsList ( { orbs,accounts }) {
   //console.log(orbs);
 
-  function getSphereInfo(sphereInfo){
-    let sphereInfoNew = ((sphereInfo.split('^^'))[0]).split(';');
+  function getSphereInfo(dna){
+    let sphereInfoNew = ((dna.split('^^'))[0]).split(';');
     let object = { a: sphereInfoNew[0], b: sphereInfoNew[1], colorHex: sphereInfoNew[2] };
     return object;
+  }
+
+  async function playSound(dna){
+    let soundInfo = ((dna.split('^^'))[1]).split('||');
+    const now = Tone.now();
+    
+    if (Tone.Transport.state === "paused" ) {  
+        Tone.Transport.start("+0.1");
+    }else {
+        Tone.Transport.pause();
+    }
+
+    for(let i=0;i < soundInfo.length;i++){ 
+      let info = soundInfo[i].split(';');
+      console.log(now+parseFloat(info[2]));
+      sampler.triggerAttack(info[0]+info[1], now+parseFloat(info[2]), 2);
+    }
   }
 
   const classes = useStyles();
@@ -36,9 +56,10 @@ function OrbsList ( { orbs,accounts }) {
                                                 <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
                                                 <pointLight position={[-10, -10, -10]} />
                                                 <Sphere sphereInfo={getSphereInfo(orb.dna)} position={[-1.2, 0, 0]} />
-                                                <OrbitControls enableZoom={false} ></OrbitControls>                                      
+                                                <OrbitControls ></OrbitControls>                                      
                                             </Canvas>
                                           </div>
+                                          <Button className="btnPlayOrbSound" onClick={()=>playSound(orb.dna)} >Listen</Button> 
                                           {accounts[0]!=orb.owner ? <Button className="btnBuy" >Buy</Button> :<></>}
                                         </Grid>)}) );
 }
