@@ -39,7 +39,7 @@ function App() {
         setWeb3(web3);
         setAccounts(accounts);
         setContract(contract);
-        setOrbs(orbsResult);
+        if(orbsResult) setOrbs(orbsResult);
         console.log(orbsResult);
         setLoading(false);
         console.log(orbs);
@@ -68,9 +68,9 @@ function App() {
 
 
   async function reloadList(){
+    console.log('reloadlist');
     const orbsResult = await contract.methods.getAllOrbs().call();
     setOrbs(orbsResult);
-    console.log(orbsResult);
   }
 
 
@@ -81,7 +81,7 @@ function App() {
           <Container id="main_container" maxWidth="false">
             <Grid container spacing={2}>         
                 <OrbBirth accounts={accounts} contract={contract} reloadList={reloadList}/>
-                <OrbsList orbs={orbs} />
+                <OrbsList orbs={orbs} accounts={accounts} />
             </Grid>
           </Container>     
           :

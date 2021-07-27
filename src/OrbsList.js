@@ -1,7 +1,8 @@
 import React, { useRef, useEffect } from 'react'
-import { Grid,Avatar,Paper,makeStyles } from '@material-ui/core';
+import { Grid,Button,Paper,makeStyles } from '@material-ui/core';
 import { lightGreen } from '@material-ui/core/colors';
 import { Player } from 'video-react';
+import web3 from 'web3';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -9,25 +10,22 @@ const useStyles = makeStyles((theme) => ({
     '& > *': {
       margin: theme.spacing(1),
     },
-  },
-  green: {
-    color: theme.palette.getContrastText(lightGreen[500]),
-    backgroundColor: lightGreen[500],   
-    width: theme.spacing(7),
-    height: theme.spacing(7)
   }
 }));
 
-function OrbsList ( { orbs }) {
+function OrbsList ( { orbs,accounts }) {
   //console.log(orbs);
   const classes = useStyles();
   return ( orbs.map(orb => {return (
-                                      <Grid item xs={4} className="video_item">
-                                        <div className={classes.green}>{orb.price} bnb</div>
-                                        <Player
-                                            playsInline
+                                      <Grid item xs={4} className="video_item">   
+                                          <Player
                                             src={orb.uri} 
                                           />
+                                          <div>
+                                            <p>Price: {web3.utils.fromWei(orb.price, 'ether')} eth</p>
+                                            <p>Owner: {orb.owner}</p>
+                                          </div>
+                                          {accounts[0]!=orb.owner ? <Button className="btnBuy" >Buy</Button> :<></>}
                                         </Grid>)}) );
 }
 

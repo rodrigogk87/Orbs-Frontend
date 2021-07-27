@@ -3,7 +3,7 @@ import * as Tone from 'tone'
 import sampler from "./samplerLoader";
 import { soliditySha3 }  from 'web3-utils';
 import {Button,Grid,Avatar} from '@material-ui/core';
-
+import web3 from 'web3';
 
 /*Generally speaking, using setState inside useEffect will create an infinite loop that most likely you don't want to cause. 
 There are a couple of exceptions to that rule which I will get into later.
@@ -25,7 +25,7 @@ component and you want to save the request data in the component's state.*/
 //https://stackoverflow.com/questions/15970729/appending-blob-data
 //https://github.com/samirkumardas/jmuxer
 //muxer ---> obj that conmbines video and audio
-//https://ipfs.infura.io/ipfs/QmQnbxfGtXFfB5vr7qUrzNHdNnQiHzm6yDnysW3P2dYj7P
+//https://ipfs.infura.io/ipfs/QmNMgdubv1NY7cVrDSyyxSa5Gcu3ueaFm6DzRGkZEVwrqt
 //https://modernweb.com/creating-particles-html5-canvas/
 //https://codepen.io/blancocd/pen/wvJXpge
 //https://xparkmedia.com/blog/mediaelements-add-a-share-button-to-video-elements-using-jquery/
@@ -58,13 +58,14 @@ function OrbBirth({accounts,contract,reloadList}){
   useEffect(() => {
     const canvas = canvasRef.current
     const context = canvas.getContext('2d')
-    context.canvas.width  = window.innerWidth/2;
-    context.canvas.height = window.innerHeight/2;
+    // width="960" height="484"
+    context.canvas.width  = 960;
+    context.canvas.height = 484;
     let frameCount = 0
     let animationFrameId
     let subelements = [];
     for(let i=0;i<elements.length;i++){
-      if(i>10){
+      if(i>5){
         break;
       }
       subelements[i] = elements[i];
@@ -87,31 +88,32 @@ function OrbBirth({accounts,contract,reloadList}){
 
   useEffect(() => {
     const uploadToIpfs = async () =>{ 
-        if(orbBlobs.length == 1){
-          console.log('entro');
-          setFinished(true);
-          setBorning(false);
-          
+        if(orbBlobs.length == 1){    
+          console.log(orbBlobs[0],'file to uload');
           const file = await ipfs.add(orbBlobs[0],async (error, result) => {
               console.log('Ipfs result', result)
               if(error) {
-                console.error(error)
+                console.error(error,'error ipfs')
                 return
               }else{
-                console.log(result[0].hash);            
+                console.log(result[0].hash,'hash');            
                 
               }
-            })
-          
+          })
+          console.log(file,'file',file.path,'filepath');
           if(typeof file.path !== "undefined" && file.path!=''){
-            let res = await contract.methods.mintCollectable(accounts[0],file.path).send({from:accounts[0] }).on('transactionHash', (hash) => {
-              setFinished(true);
-              reloadList();
-              console.log(hash);
-            }) 
-          }
+              console.log(accounts[0],file.path,'to mint');
+              await contract.methods.mintCollectable(accounts[0],file.path).send({from:accounts[0],value: web3.utils.toWei('0.01', 'ether') }).then((result) => {
+                  setFinished(true);
+                  setBorning(false);
+                  //reloadList();
+              }).catch((err) => {
+                  console.log("Failed with error: " + err);
+                  setFinished(true);
+                  setBorning(false);
+              });
+           }
         }
-
     }
 
     uploadToIpfs();
@@ -187,13 +189,13 @@ function OrbBirth({accounts,contract,reloadList}){
 
 
   
-  return    <div>
+  return    <div id="orbBirthParent">
                 <canvas ref={canvasRef}/>
                 {!finished && !borning ?
-                <Button id="generator" onClick={playTone} variant="contained">Mint Orb</Button>
+                <Button className="btnBirth" id="generator" onClick={playTone} variant="contained">Mint Orb</Button>
                 :
                 !borning ?
-                <Button id="reloader" onClick={()=>window.location.reload()} variant="contained">Mint Another!</Button>
+                <Button className="btnBirth" id="reloader" onClick={()=>window.location.reload()} variant="contained">Mint Another!</Button>
                 :
                 <div>Orb is borning, wait to claim.....</div>
                 }

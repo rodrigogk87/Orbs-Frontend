@@ -1,7 +1,28 @@
-#main_container{
-  background-color:black;
-  color:white;
+body > #root > div {
+  height: 100vh;
 }
-.video_item{
-  border: 1px solid white;
+.App{
+  background-color:#121212;
+  color:rgb(255, 255, 255);
+  height: 100%;
+  width: 100%;
+}
+.App-header{
+  background-color:#121212;
+  color:rgb(255, 255, 255);
+}
+.btnBuy{
+  color: rgba(0, 0, 0, 0.87);
+  width: 100%;
+  height: 56px;
+  background-color: #8bc34a!important;
+}
+.btnBuy:hover{
+  background-color: #638d33!important; 
+}
+.btnBirth{
+  margin-bottom: 50px!important;
+}
+#orbBirthParent{
+  width:100%!important;
 }
