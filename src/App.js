@@ -1,7 +1,7 @@
 import logo from './logo.svg';
 import './App.css';
 import React,{ useState,useEffect }  from 'react';
-import OrbBirth from './OrbBirth';
+import OrbBirthData from './OrbBirthData';
 import OrbsList from './OrbsList';
 import Orbs from './contracts/Orbs.json';
 import { getWeb3 } from './utils.js';
@@ -80,7 +80,7 @@ function App() {
         {web3 ?
           <Container id="main_container" maxWidth="false">
             <Grid container spacing={2}>         
-                <OrbBirth accounts={accounts} contract={contract} reloadList={reloadList}/>
+                <OrbBirthData accounts={accounts} contract={contract} reloadList={reloadList}/>
                 <OrbsList orbs={orbs} accounts={accounts} />
             </Grid>
           </Container>     

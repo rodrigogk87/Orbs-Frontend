@@ -5,6 +5,8 @@
   "dependencies": {
     "@material-ui/core": "^4.12.2",
     "@metamask/detect-provider": "github:metamask/detect-provider",
+    "@react-three/drei": "^7.2.2",
+    "@react-three/fiber": "^7.0.6",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",

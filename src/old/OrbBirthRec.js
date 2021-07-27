@@ -4,6 +4,8 @@ import sampler from "./samplerLoader";
 import { soliditySha3 }  from 'web3-utils';
 import {Button,Grid,Avatar} from '@material-ui/core';
 import web3 from 'web3';
+import { Canvas, useFrame } from '@react-three/fiber'
+
 
 /*Generally speaking, using setState inside useEffect will create an infinite loop that most likely you don't want to cause. 
 There are a couple of exceptions to that rule which I will get into later.
@@ -30,6 +32,12 @@ component and you want to save the request data in the component's state.*/
 //https://codepen.io/blancocd/pen/wvJXpge
 //https://xparkmedia.com/blog/mediaelements-add-a-share-button-to-video-elements-using-jquery/
 //https://video-react.js.org/
+/*
+  ANOTHER INTERESTING POSIBILITY IS STORE THE DATA BUT NOT AS A VIDEO BUT AS THE DATA TO RECONSTRUCT THE
+  CANVAS ELEMENT AND THE SOUND, SO WE LET THEM PLAY WITH THE ELEMENT WITH ORBITABLE AND THAT STUFF AND IS MORE
+  INTERACTIVE, WE CAN HAVE A LIST AND OTHER USERS CAN PLAY WITH THEM IF THEY LIKE THEY CAN BUY THEM
+
+*/
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient.create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' }) 
 
@@ -45,51 +53,43 @@ function OrbBirth({accounts,contract,reloadList}){
   let soundInfo = [];
 
   
-  const draw = (ctx, frameCount,elements) => {
-    if(elements.length > 0){
-      ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-      ctx.fillStyle = '#'+elements[frameCount%elements.length];
-      ctx.beginPath()
-      ctx.arc(ctx.canvas.width/2, ctx.canvas.height/2, 50*(0.7+Math.sin(frameCount*0.05)**2), 0, 2*Math.PI)
-      ctx.fill()
-    }
-  }
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const context = canvas.getContext('2d')
-    // width="960" height="484"
-    context.canvas.width  = 960;
-    context.canvas.height = 484;
-    let frameCount = 0
-    let animationFrameId
-    let subelements = [];
-    for(let i=0;i<elements.length;i++){
-      if(i>5){
-        break;
-      }
-      subelements[i] = elements[i];
-    }
-    //Our draw came here
-    const render = () => {
-      frameCount++
-      draw(context, frameCount,subelements)
-      animationFrameId = window.requestAnimationFrame(render)
-      if(orbBlobs.length == 1)
-      context.clearRect(0, 0, canvas.width, canvas.height);
-    }
-    render()
+  function Sphere(props) {
+    // This reference will give us direct access to the mesh
+    const mesh = useRef()
+    // Set up state for the hovered and active state
+    // Rotate mesh every frame, this is outside of React without overhead
+    useFrame(() => {
+      mesh.current.rotation.x = mesh.current.rotation.y += 0.01
+    })
     
-    return () => {
-      window.cancelAnimationFrame(animationFrameId);
-    }
-  }, [draw])
+    let colorhex = props.elements[0];
+    console.log(colorhex);
+    let a = 0.1+(Math.random() * 30);
+    let b = 0.1+(Math.random() * 30);
+
+    return (
+      <mesh
+        {...props}
+        ref={mesh}
+        scale={1}>
+        <sphereBufferGeometry args={[1, a, b]} />
+        <meshPhysicalMaterial color={"#"+colorhex} nvMapIntensity={1} clearcoat={0.1} clearcoatRoughness={0} roughness={1} metalness={0.4} />
+      </mesh>
+    )
+  }
 
 
   useEffect(() => {
     const uploadToIpfs = async () =>{ 
         if(orbBlobs.length == 1){    
-          console.log(orbBlobs[0],'file to uload');
+          /*setFinished(true);
+          setBorning(false);
+          const url = URL.createObjectURL(orbBlobs[0]);
+          const anchor = document.createElement("a");
+          anchor.download = "recording.webm";
+          anchor.href = url;
+          anchor.click();*/
+          /*console.log(orbBlobs[0],'file to uload');
           const file = await ipfs.add(orbBlobs[0],async (error, result) => {
               console.log('Ipfs result', result)
               if(error) {
@@ -112,7 +112,7 @@ function OrbBirth({accounts,contract,reloadList}){
                   setFinished(true);
                   setBorning(false);
               });
-           }
+           }*/
         }
     }
 
@@ -149,7 +149,7 @@ function OrbBirth({accounts,contract,reloadList}){
     let j=0;
     for(let i=0;duration-j > 0;i++){ 
       
-      j= i/(Math.round((Math.random() * 2) + ((Math.random() * 10) + 1)) );
+      j= i/(Math.round((Math.random() * 2) + ((Math.random() * 5) + 1)) );
       
       if(j < jaux){
         j=jaux+1/((Math.random() * 6) + 2);
@@ -184,13 +184,18 @@ function OrbBirth({accounts,contract,reloadList}){
     
   const canvasRef = useRef(null)
 
-
-
-
-
   
   return    <div id="orbBirthParent">
-                <canvas ref={canvasRef}/>
+                <Canvas ref={canvasRef}>
+                  {borning ?
+                    <>
+                    <ambientLight intensity={0.5} />
+                    <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+                    <pointLight position={[-10, -10, -10]} />
+                    <Sphere elements={elements} position={[-1.2, 0, 0]} /></>
+                    :<></>
+                  }
+                </Canvas>
                 {!finished && !borning ?
                 <Button className="btnBirth" id="generator" onClick={playTone} variant="contained">Mint Orb</Button>
                 :
