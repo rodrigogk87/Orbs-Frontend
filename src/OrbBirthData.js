@@ -50,10 +50,17 @@ function OrbBirthData({accounts,contract,reloadList}){
       const saveContract = async () =>{ 
         let mint_fee = web3.utils.toWei('0.01', 'ether');
         let dna = sphereInfo.a+';'+sphereInfo.b+';'+sphereInfo.colorHex+'^^'+soundInfo;
-        let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0], value: mint_fee});   
-        setFinished(true);
-        setBorning(false);
-        reloadList(); 
+        try{
+          let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0], value: mint_fee});
+          setFinished(true);
+          setBorning(false);
+          reloadList(); 
+        }  
+        catch(e){
+          setFinished(true);
+          setBorning(false);
+          reloadList(); 
+        }
         //console.log(res);
       }
   
