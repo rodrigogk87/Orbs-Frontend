@@ -40,7 +40,7 @@ function OrbBirthData({accounts,contract,reloadList}){
     if(soundInfo){
       let arrayValues = (soundInfo.split('||'))[0].split(';');
       let colorHex = arrayValues[arrayValues.length-1];
-      setSphereInfo({a: Math.round((Math.random() * 30) + 1),b:Math.round((Math.random() * 30) + 1),colorHex: colorHex})
+      setSphereInfo({a: Math.floor((Math.random() * 30) + 1),b:Math.floor((Math.random() * 30) + 1),colorHex: colorHex})
     }
   }, [soundInfo])
 
@@ -48,8 +48,9 @@ function OrbBirthData({accounts,contract,reloadList}){
     if(sphereInfo){
       //guardar info en Smart contract
       const saveContract = async () =>{ 
+        let mint_fee = web3.utils.toWei('0.01', 'ether');
         let dna = sphereInfo.a+';'+sphereInfo.b+';'+sphereInfo.colorHex+'^^'+soundInfo;
-        let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0]});    
+        let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0], value: mint_fee});    
         console.log(res);
       }
   
@@ -72,10 +73,10 @@ function OrbBirthData({accounts,contract,reloadList}){
     let soundInfoTmp = '';
     for(let i=0;duration-j > 0;i++){ 
       
-      j= i/(Math.round((Math.random() * 2) + ((Math.random() * 5) + 1)) );
+      j= i/(Math.round((Math.random() * 2) + ((Math.random() * 11) + 1)) );
       
       if(j < jaux){
-        j=jaux+(1/2);
+        j=jaux+(1/4);
       }
       jaux = j;
       let note=Math.round((Math.random() * 6) + 1);
@@ -116,7 +117,7 @@ function OrbBirthData({accounts,contract,reloadList}){
                     <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
                     <pointLight position={[-10, -10, -10]} />
                     <Sphere sphereInfo={sphereInfo} position={[-1.2, 0, 0]} />
-                    <OrbitControls enableZoom={false} ></OrbitControls>
+                    <OrbitControls ></OrbitControls>
                     </>
                     :<></>
                   }

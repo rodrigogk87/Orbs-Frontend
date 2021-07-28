@@ -19,7 +19,7 @@ export default function Sphere(props) {
         ref={mesh}
         scale={1}>
         <sphereBufferGeometry args={[1, props.sphereInfo.b, props.sphereInfo.c]}/>
-        <meshPhysicalMaterial color={"#"+props.sphereInfo.colorHex} nvMapIntensity={1} clearcoat={0.1} clearcoatRoughness={0} roughness={1} metalness={0.4} />
+        <meshPhysicalMaterial flatShading={(props.sphereInfo.b % 2) == 0} color={"#"+props.sphereInfo.colorHex} nvMapIntensity={1} clearcoat={0.1} clearcoatRoughness={0} roughness={1} metalness={0.4} />
       </mesh>
     )
   }

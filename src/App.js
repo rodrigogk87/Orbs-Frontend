@@ -85,7 +85,7 @@ function App() {
             </Grid>
           </Container>     
           :
-          <></>
+          <div>Metamask not connected</div>
           }
       </header>
     </div>
