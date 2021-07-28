@@ -50,8 +50,11 @@ function OrbBirthData({accounts,contract,reloadList}){
       const saveContract = async () =>{ 
         let mint_fee = web3.utils.toWei('0.01', 'ether');
         let dna = sphereInfo.a+';'+sphereInfo.b+';'+sphereInfo.colorHex+'^^'+soundInfo;
-        let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0], value: mint_fee});    
-        console.log(res);
+        let res = await contract.methods.mintCollectable(accounts[0],dna).send({from:accounts[0], value: mint_fee});   
+        setFinished(true);
+        setBorning(false);
+        reloadList(); 
+        //console.log(res);
       }
   
       saveContract();
@@ -67,7 +70,7 @@ function OrbBirthData({accounts,contract,reloadList}){
     const duration = 15;
     setDuration(duration);
     const now = Tone.now(); 
-    console.log(now);
+    //console.log(now);
     let jaux = -1;
     let j=0;
     let soundInfoTmp = '';
@@ -98,11 +101,6 @@ function OrbBirthData({accounts,contract,reloadList}){
     
     setSoundInfo(soundInfoTmp);
 
-    setTimeout(async () => {
-      setFinished(true);
-      setBorning(false);
-    }, duration * 1000);
-
   }
   
     
@@ -122,11 +120,8 @@ function OrbBirthData({accounts,contract,reloadList}){
                     :<></>
                   }
                 </Canvas>
-                {!finished && !borning ?
+                {!borning ?
                 <Button className="btnBirth" id="generator" onClick={playTone} variant="contained">Mint Orb</Button>
-                :
-                !borning ?
-                <Button className="btnBirth" id="reloader" onClick={()=>window.location.reload()} variant="contained">Mint Another!</Button>
                 :
                 <div>Orb is borning, wait to claim.....</div>
                 }

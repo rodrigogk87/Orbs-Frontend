@@ -34,7 +34,7 @@ function OrbsList ( { orbs,accounts }) {
 
     for(let i=0;i < soundInfo.length;i++){ 
       let info = soundInfo[i].split(';');
-      console.log(now,now+parseFloat(info[2]));
+      //console.log(now,now+parseFloat(info[2]));
       sampler.triggerAttack(info[0]+info[1], now+parseFloat(info[2]), 2);
     }
   }
