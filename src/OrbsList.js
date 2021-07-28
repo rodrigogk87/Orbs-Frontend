@@ -41,21 +41,21 @@ function OrbsList ( { orbs,accounts }) {
 
   const classes = useStyles();
   return ( orbs.map(orb => {return (
-                                      <Grid item xs={12} className="video_item">   
-                                          <div>
-                                            <p>Price: {web3.utils.fromWei(orb.price, 'ether')} eth</p>
-                                            <p>Owner: {orb.owner}</p>
-                                            <Canvas id="canvas_list">
-                                                <ambientLight intensity={0.5} />
-                                                <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
-                                                <pointLight position={[-10, -10, -10]} />
-                                                <Sphere sphereInfo={getSphereInfo(orb.dna)} position={[-1.2, 0, 0]} />
-                                                <OrbitControls ></OrbitControls>                                      
-                                            </Canvas>
-                                          </div>
-                                          <Button className="btnPlayOrbSound" onClick={()=>playSound(orb.dna)} >Listen</Button> 
-                                          {accounts[0]!=orb.owner ? <Button className="btnBuy" >Buy</Button> :<></>}
-                                        </Grid>)}) );
+                              <Grid item xs={12} className="video_item">   
+                                  <div>
+                                    <p>Price: {web3.utils.fromWei(orb.price, 'ether')} eth</p>
+                                    <p>Owner: {orb.owner}</p>
+                                    <Canvas id="canvas_list">
+                                        <ambientLight intensity={0.5} />
+                                        <spotLight position={[10, 10, 10]} angle={0.15} penumbra={1} />
+                                        <pointLight position={[-10, -10, -10]} />
+                                        <Sphere sphereInfo={getSphereInfo(orb.dna)} position={[-1.2, 0, 0]} />
+                                        <OrbitControls ></OrbitControls>                                      
+                                    </Canvas>
+                                  </div>
+                                  <Button className="btnPlayOrbSound" onClick={()=>playSound(orb.dna)} >Listen</Button> 
+                                  {accounts[0]!=orb.owner ? <Button className="btnBuy" >Buy</Button> :<></>}
+                                </Grid>)}) );
 }
 
 export default OrbsList

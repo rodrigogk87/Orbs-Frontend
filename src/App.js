@@ -77,7 +77,16 @@ function App() {
 
   
   useEffect(() => {
-    //console.log('new orbs loaded',orbs)
+    const init = async () =>{
+      console.log(contract);
+      if(typeof contract !== 'undefined'){
+        const orbsCount = await contract.methods.getNumberOfOrbs().call();
+        setOrbsCount(orbsCount);
+      }
+    }
+    
+    init();
+
   }, [orbs]);
 
 
@@ -90,7 +99,7 @@ function App() {
   }
 
   async function getPrevOrbs(){
-    let index = currentPagIndex-1;
+    let index = currentPagIndex-paginationPages;
     const orbsResult = await contract.methods.getNthsOrbs(index,paginationPages).call();
     setOrbs(orbsResult);
     setCurrentPagIndex(index);
