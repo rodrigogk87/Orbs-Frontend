@@ -82,6 +82,7 @@ function App() {
       if(typeof contract !== 'undefined'){
         const orbsCount = await contract.methods.getNumberOfOrbs().call();
         setOrbsCount(orbsCount);
+        //console.log(orbsCount,currentPagIndex,'updatedOrbs');
       }
     }
     
